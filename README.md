@@ -45,3 +45,9 @@ Cada llegada (en `llegadas` y `buses`) trae: `linea`, `color`, `tiempo` (texto),
 
 ## Desarrollo
 Pruebas del parser (sin Home Assistant): `python -m unittest discover tests`. Los datos de prueba son sintéticos, basados en la descripción del contrato. La integración completa no tiene aún pruebas automáticas dentro de Home Assistant.
+
+## Colaborar
+Lee [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Licencia
+[GNU LGPL v3](LICENSE). No es un producto oficial de iTranvías ni de la Compañía de Tranvías de La Coruña.
