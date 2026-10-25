@@ -1,0 +1,46 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "A Coruña bus stop",
+        "description": "Stop number (shown on the shelter or in iTranvías).",
+        "data": {
+          "parada": "Stop number",
+          "max_llegadas": "Maximum arrivals to show",
+          "intervalo": "Polling interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not query iTranvías",
+      "parada_desconocida": "That stop is not in the iTranvías catalogue"
+    },
+    "abort": {
+      "already_configured": "This stop is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "max_llegadas": "Maximum arrivals to show",
+          "intervalo": "Polling interval (seconds)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "proximo": {
+        "name": "Next bus"
+      },
+      "conteo": {
+        "name": "Buses on the way"
+      },
+      "ultima_actualizacion": {
+        "name": "Last update"
+      }
+    }
+  }
+}

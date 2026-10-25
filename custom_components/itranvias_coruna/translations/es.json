@@ -1,0 +1,46 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Parada de autobús de A Coruña",
+        "description": "Número de parada (el de la marquesina o el de iTranvías).",
+        "data": {
+          "parada": "Número de parada",
+          "max_llegadas": "Máximo de llegadas a mostrar",
+          "intervalo": "Intervalo de consulta (segundos)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "No se pudo consultar iTranvías",
+      "parada_desconocida": "Esa parada no existe en el catálogo de iTranvías"
+    },
+    "abort": {
+      "already_configured": "Esta parada ya está configurada"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opciones",
+        "data": {
+          "max_llegadas": "Máximo de llegadas a mostrar",
+          "intervalo": "Intervalo de consulta (segundos)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "proximo": {
+        "name": "Próximo bus"
+      },
+      "conteo": {
+        "name": "Buses en camino"
+      },
+      "ultima_actualizacion": {
+        "name": "Última actualización"
+      }
+    }
+  }
+}

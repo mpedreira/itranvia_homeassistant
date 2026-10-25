@@ -1,0 +1,12 @@
+{
+  "domain": "itranvias_coruna",
+  "name": "iTranvías A Coruña",
+  "codeowners": ["@mpedreira"],
+  "config_flow": true,
+  "documentation": "https://github.com/mpedreira/itranvia_homeassistant",
+  "issue_tracker": "https://github.com/mpedreira/itranvia_homeassistant/issues",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "version": "0.2.1"
+}
