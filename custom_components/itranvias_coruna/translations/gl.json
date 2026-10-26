@@ -13,7 +13,8 @@
     },
     "error": {
       "cannot_connect": "Non se puido consultar iTranvías",
-      "parada_desconocida": "Esa parada non existe no catálogo de iTranvías"
+      "parada_desconocida": "Esa parada non existe no catálogo de iTranvías",
+      "intervalo_demasiado_bajo": "Intervalo demasiado baixo: coas paradas configuradas o provedor bloquearíate (límite de 1999 consultas ao día). Usa polo menos {minimo} segundos."
     },
     "abort": {
       "already_configured": "Esta parada xa está configurada"
@@ -28,6 +29,9 @@
           "intervalo": "Intervalo de consulta (segundos)"
         }
       }
+    },
+    "error": {
+      "intervalo_demasiado_bajo": "Intervalo demasiado baixo: coas paradas configuradas o provedor bloquearíate (límite de 1999 consultas ao día). Usa polo menos {minimo} segundos."
     }
   },
   "entity": {
@@ -41,6 +45,12 @@
       "ultima_actualizacion": {
         "name": "Última actualización"
       }
+    }
+  },
+  "issues": {
+    "limite_consultas": {
+      "title": "Límite de consultas de iTranvías",
+      "description": "A parada {parada} está recibindo bloqueos do provedor (HTTP 429/403/503). O intervalo actual é de {intervalo} s. Coas paradas configuradas recoméndase polo menos {minimo} s. Súbeo en Configurar. O aviso desaparece só cando volve funcionar."
     }
   }
 }

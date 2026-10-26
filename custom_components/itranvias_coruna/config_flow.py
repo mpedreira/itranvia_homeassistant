@@ -17,6 +17,8 @@ from .const import (
     DEFAULT_INTERVALO,
     DEFAULT_MAX_LLEGADAS,
     DOMAIN,
+    excede_limite,
+    intervalo_minimo,
     MAX_INTERVALO,
     MAX_MAX_LLEGADAS,
     MIN_INTERVALO,
@@ -34,6 +36,22 @@ def _esquema_opciones(intervalo: int, maximo: int) -> dict:
     }
 
 
+def _intervalos_otras(hass, excluir: str | None = None) -> list[int]:
+    return [
+        e.options.get(CONF_INTERVALO, DEFAULT_INTERVALO)
+        for e in hass.config_entries.async_entries(DOMAIN)
+        if e.entry_id != excluir
+    ]
+
+
+def _comprobar_limite(hass, intervalo: int, excluir: str | None = None):
+    """Devuelve (error, placeholders) si la suma de paradas supera el límite diario."""
+    otras = _intervalos_otras(hass, excluir)
+    if excede_limite(otras + [intervalo]):
+        return "intervalo_demasiado_bajo", {"minimo": str(intervalo_minimo(len(otras) + 1))}
+    return None, {}
+
+
 class ItranviasConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
@@ -41,17 +59,23 @@ class ItranviasConfigFlow(ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         errors: dict[str, str] = {}
+        placeholders: dict[str, str] = {}
         if user_input is not None:
             parada = user_input[CONF_PARADA]
             await self.async_set_unique_id(str(parada))
             self._abort_if_unique_id_configured()
             catalogo = get_catalogo(self.hass)
+            error_lim, placeholders = _comprobar_limite(
+                self.hass, user_input[CONF_INTERVALO]
+            )
             try:
                 await catalogo.async_asegurar()
             except ItranviasError:
                 errors["base"] = "cannot_connect"
             else:
-                if parada not in catalogo.paradas:
+                if error_lim:
+                    errors[CONF_INTERVALO] = error_lim
+                elif parada not in catalogo.paradas:
                     errors[CONF_PARADA] = "parada_desconocida"
                 else:
                     return self.async_create_entry(
@@ -68,7 +92,10 @@ class ItranviasConfigFlow(ConfigFlow, domain=DOMAIN):
             **_esquema_opciones(DEFAULT_INTERVALO, DEFAULT_MAX_LLEGADAS),
         }
         return self.async_show_form(
-            step_id="user", data_schema=vol.Schema(esquema), errors=errors
+            step_id="user",
+            data_schema=vol.Schema(esquema),
+            errors=errors,
+            description_placeholders=placeholders,
         )
 
     @staticmethod
@@ -81,8 +108,16 @@ class ItranviasOptionsFlow(OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
+        placeholders: dict[str, str] = {}
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
+            error_lim, placeholders = _comprobar_limite(
+                self.hass, user_input[CONF_INTERVALO], self.config_entry.entry_id
+            )
+            if error_lim:
+                errors[CONF_INTERVALO] = error_lim
+            else:
+                return self.async_create_entry(data=user_input)
         o = self.config_entry.options
         return self.async_show_form(
             step_id="init",
@@ -92,4 +127,6 @@ class ItranviasOptionsFlow(OptionsFlow):
                     o.get(CONF_MAX_LLEGADAS, DEFAULT_MAX_LLEGADAS),
                 )
             ),
+            errors=errors,
+            description_placeholders=placeholders,
         )

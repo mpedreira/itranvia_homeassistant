@@ -1,4 +1,5 @@
 """Constantes de la integración iTranvías A Coruña."""
+import math
 
 DOMAIN = "itranvias_coruna"
 PLATFORMS = ["sensor"]
@@ -12,8 +13,8 @@ CONF_INTERVALO = "intervalo"
 CONF_MAX_LLEGADAS = "max_llegadas"
 
 # Valor inicial configurable; NO es una frecuencia autorizada por el proveedor.
-DEFAULT_INTERVALO = 60
-MIN_INTERVALO = 30
+DEFAULT_INTERVALO = 180
+MIN_INTERVALO = 90
 MAX_INTERVALO = 600
 DEFAULT_MAX_LLEGADAS = 4
 MAX_MAX_LLEGADAS = 20
@@ -29,3 +30,24 @@ ESPERA_MINIMA_BLOQUEO = 300
 ESPERA_MAXIMA = 900
 
 STORAGE_VERSION = 1
+
+# Límites de consultas que el proveedor comunica en sus respuestas 429
+# (1 por segundo, 4 por minuto, 199 por hora, 1999 por día). El de un día es el que
+# manda con polling continuo: se deja un margen para reinicios y recargas.
+LIMITE_DIA = 1999
+MARGEN_LIMITE = 0.8
+ESCALONADO_ARRANQUE = 2  # segundos entre paradas al arrancar (límite: 1 por segundo)
+
+
+def consultas_dia(intervalos: list[int]) -> float:
+    """Consultas diarias estimadas: una por parada y por intervalo."""
+    return sum(86400 / max(i, 1) for i in intervalos)
+
+
+def intervalo_minimo(n_paradas: int) -> int:
+    """Intervalo (s) mínimo por parada para no pasar del margen del límite diario."""
+    return math.ceil(max(n_paradas, 1) * 86400 / (LIMITE_DIA * MARGEN_LIMITE))
+
+
+def excede_limite(intervalos: list[int]) -> bool:
+    return consultas_dia(intervalos) > LIMITE_DIA * MARGEN_LIMITE

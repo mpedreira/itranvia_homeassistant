@@ -13,7 +13,8 @@
     },
     "error": {
       "cannot_connect": "Could not query iTranvías",
-      "parada_desconocida": "That stop is not in the iTranvías catalogue"
+      "parada_desconocida": "That stop is not in the iTranvías catalogue",
+      "intervalo_demasiado_bajo": "Interval too low: with the configured stops the provider would block you (limit of 1999 requests per day). Use at least {minimo} seconds."
     },
     "abort": {
       "already_configured": "This stop is already configured"
@@ -28,6 +29,9 @@
           "intervalo": "Polling interval (seconds)"
         }
       }
+    },
+    "error": {
+      "intervalo_demasiado_bajo": "Interval too low: with the configured stops the provider would block you (limit of 1999 requests per day). Use at least {minimo} seconds."
     }
   },
   "entity": {
@@ -41,6 +45,12 @@
       "ultima_actualizacion": {
         "name": "Last update"
       }
+    }
+  },
+  "issues": {
+    "limite_consultas": {
+      "title": "iTranvías request limit",
+      "description": "Stop {parada} is being blocked by the provider (HTTP 429/403/503). The current interval is {intervalo} s. With the configured stops at least {minimo} s is recommended. Raise it in Configure. The notice clears itself once it works again."
     }
   }
 }

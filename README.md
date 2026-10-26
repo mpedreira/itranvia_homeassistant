@@ -4,7 +4,7 @@ Muestra cuánto falta para que lleguen los autobuses a una parada de A Coruña, 
 
 ## Aviso
 
-Integración no oficial. Usa la API web de iTranvías, que **no tiene documentación oficial ni garantía de estabilidad** y puede cambiar o dejar de funcionar sin aviso. Lecturas públicas sin autenticación. El intervalo de 60 s es un valor inicial configurable, no una frecuencia autorizada por el proveedor; no lo bajes sin necesidad.
+Integración no oficial. Usa la API web de iTranvías, que **no tiene documentación oficial ni garantía de estabilidad** y puede cambiar o dejar de funcionar sin aviso. Lecturas públicas sin autenticación. El intervalo (por defecto 180 s) es un valor inicial configurable, no una frecuencia autorizada por el proveedor; no lo bajes sin necesidad.
 
 ## Instalación
 **HACS:** menú ⋮ → *Repositorios personalizados* → URL de este repositorio, categoría *Integración* → instalar y reiniciar.
@@ -14,7 +14,7 @@ Integración no oficial. Usa la API web de iTranvías, que **no tiene documentac
 Ajustes → Dispositivos y servicios → Añadir integración → *iTranvías A Coruña*:
 - **Número de parada** (se comprueba contra el catálogo).
 - **Máximo de llegadas** a mostrar en `llegadas` y `texto` (por defecto 4).
-- **Intervalo de consulta** en segundos (por defecto 60, entre 30 y 600).
+- **Intervalo de consulta** en segundos (por defecto 180, entre 90 y 600).
 
 Se puede repetir para varias paradas. Las dos últimas opciones se cambian después en *Configurar*.
 
@@ -51,3 +51,15 @@ Lee [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Licencia
 [GNU LGPL v3](LICENSE). No es un producto oficial de iTranvías ni de la Compañía de Tranvías de La Coruña.
+
+## Límites de consultas
+
+El proveedor responde `429 Too Many Requests` si se supera: 1 consulta por segundo, 4 por minuto, 199 por hora y 1999 por día. Cada parada hace una consulta por intervalo, así que el que manda es el diario:
+
+| Paradas | Intervalo mínimo recomendado | Consultas/día |
+|---|---|---|
+| 1 | 55 s | ~1570 |
+| 2 | 109 s | ~1590 |
+| 3 | 163 s | ~1590 |
+
+La integración lo comprueba al configurar (rechaza intervalos que, sumando todas las paradas, pasen del 80 % del límite diario), escalona las paradas al arrancar y, si el proveedor bloquea, crea un aviso en Reparaciones con el intervalo recomendado.

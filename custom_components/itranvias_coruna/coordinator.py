@@ -7,6 +7,7 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
@@ -22,6 +23,7 @@ from .const import (
     DOMAIN,
     ESPERA_MAXIMA,
     ESPERA_MINIMA_BLOQUEO,
+    intervalo_minimo,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -53,6 +55,27 @@ class ItranviasCoordinator(DataUpdateCoordinator[dict[int, list[dict[str, Any]]]
             update_interval=timedelta(seconds=self._intervalo_base),
         )
 
+    @property
+    def _id_aviso(self) -> str:
+        return f"limite_consultas_{self.parada}"
+
+    def _avisar_limite(self) -> None:
+        """Avisa en Reparaciones de que el proveedor está limitando las consultas."""
+        n = len(self.hass.config_entries.async_entries(DOMAIN))
+        ir.async_create_issue(
+            self.hass,
+            DOMAIN,
+            self._id_aviso,
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key="limite_consultas",
+            translation_placeholders={
+                "parada": str(self.parada),
+                "intervalo": str(self._intervalo_base),
+                "minimo": str(intervalo_minimo(n)),
+            },
+        )
+
     async def _async_update_data(self) -> dict[int, list[dict[str, Any]]]:
         try:
             llegadas = await async_get_llegadas(
@@ -63,10 +86,12 @@ class ItranviasCoordinator(DataUpdateCoordinator[dict[int, list[dict[str, Any]]]
             espera = self._intervalo_base * 2 ** min(self._fallos, 5)
             if err.bloqueado:
                 espera = max(espera, ESPERA_MINIMA_BLOQUEO)
+                self._avisar_limite()
             self.update_interval = timedelta(seconds=min(espera, ESPERA_MAXIMA))
             raise UpdateFailed(str(err)) from err
 
         self._fallos = 0
+        ir.async_delete_issue(self.hass, DOMAIN, self._id_aviso)
         self.update_interval = timedelta(seconds=self._intervalo_base)
         self.ultimo_ok = dt_util.utcnow()
         desconocidas = any(not self.catalogo.tiene_linea(l) for l in llegadas)
