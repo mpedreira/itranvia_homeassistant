@@ -18,11 +18,17 @@ from .const import (
     CONF_INTERVALO,
     CONF_MAX_LLEGADAS,
     CONF_PARADA,
+    CONF_PAUSA_DESDE,
+    CONF_PAUSA_HASTA,
     DEFAULT_INTERVALO,
     DEFAULT_MAX_LLEGADAS,
+    DEFAULT_PAUSA_DESDE,
+    DEFAULT_PAUSA_HASTA,
     DOMAIN,
     ESPERA_MAXIMA,
     ESPERA_MINIMA_BLOQUEO,
+    en_pausa,
+    horas_activas,
     intervalo_minimo,
 )
 
@@ -45,6 +51,8 @@ class ItranviasCoordinator(DataUpdateCoordinator[dict[int, list[dict[str, Any]]]
         self.catalogo = catalogo
         self.max_llegadas: int = entry.options.get(CONF_MAX_LLEGADAS, DEFAULT_MAX_LLEGADAS)
         self._intervalo_base: int = entry.options.get(CONF_INTERVALO, DEFAULT_INTERVALO)
+        self._pausa_desde: str = entry.options.get(CONF_PAUSA_DESDE, DEFAULT_PAUSA_DESDE)
+        self._pausa_hasta: str = entry.options.get(CONF_PAUSA_HASTA, DEFAULT_PAUSA_HASTA)
         self._fallos = 0
         self.ultimo_ok: datetime | None = None
         super().__init__(
@@ -72,11 +80,22 @@ class ItranviasCoordinator(DataUpdateCoordinator[dict[int, list[dict[str, Any]]]
             translation_placeholders={
                 "parada": str(self.parada),
                 "intervalo": str(self._intervalo_base),
-                "minimo": str(intervalo_minimo(n)),
+                "minimo": str(
+                    intervalo_minimo(n, horas_activas(self._pausa_desde, self._pausa_hasta))
+                ),
             },
         )
 
+    def _en_pausa(self) -> bool:
+        ahora = dt_util.now()
+        return en_pausa(ahora.hour * 60 + ahora.minute, self._pausa_desde, self._pausa_hasta)
+
     async def _async_update_data(self) -> dict[int, list[dict[str, Any]]]:
+        if self._en_pausa():
+            # Pausa nocturna: no se consulta al proveedor. Sin datos = "Sin buses".
+            self._fallos = 0
+            self.update_interval = timedelta(seconds=self._intervalo_base)
+            return {}
         try:
             llegadas = await async_get_llegadas(
                 async_get_clientsession(self.hass), self.parada

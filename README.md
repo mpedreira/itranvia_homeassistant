@@ -15,6 +15,7 @@ Ajustes → Dispositivos y servicios → Añadir integración → *iTranvías A 
 - **Número de parada** (se comprueba contra el catálogo).
 - **Máximo de llegadas** a mostrar en `llegadas` y `texto` (por defecto 4).
 - **Intervalo de consulta** en segundos (por defecto 180, entre 90 y 600).
+- **Pausa nocturna**: desde y hasta qué hora no se consulta (por defecto 00:30–05:30).
 
 Se puede repetir para varias paradas. Las dos últimas opciones se cambian después en *Configurar*.
 
@@ -54,12 +55,16 @@ Lee [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Límites de consultas
 
-El proveedor responde `429 Too Many Requests` si se supera: 1 consulta por segundo, 4 por minuto, 199 por hora y 1999 por día. Cada parada hace una consulta por intervalo, así que el que manda es el diario:
+El proveedor responde `429 Too Many Requests` si se supera: 1 consulta por segundo, 4 por minuto, 199 por hora y 1999 por día. Cada parada hace una consulta por intervalo, así que el que manda es el diario.
 
-| Paradas | Intervalo mínimo recomendado | Consultas/día |
+Intervalo mínimo recomendado por parada (con el margen del 80 % del límite diario):
+
+| Paradas | Sin pausa nocturna | Con pausa 00:30–05:30 (19 h activas) |
 |---|---|---|
-| 1 | 55 s | ~1570 |
-| 2 | 109 s | ~1590 |
-| 3 | 163 s | ~1590 |
+| 1 | 55 s | 43 s |
+| 2 | 109 s | 86 s |
+| 3 | 163 s | 129 s |
 
-La integración lo comprueba al configurar (rechaza intervalos que, sumando todas las paradas, pasen del 80 % del límite diario), escalona las paradas al arrancar y, si el proveedor bloquea, crea un aviso en Reparaciones con el intervalo recomendado.
+**Pausa nocturna.** Entre las horas "No consultar desde" y "No consultar hasta" (por defecto 00:30 y 05:30, hora de Home Assistant) la integración no consulta al proveedor y los sensores marcan "Sin buses". Si las dos horas son iguales, no hay pausa. Admite pausas que cruzan medianoche (por ejemplo 23:00–06:00).
+
+La integración comprueba el límite al configurar (rechaza intervalos que, sumando todas las paradas y descontando la pausa, pasen del 80 % del límite diario), escalona las paradas al arrancar y, si el proveedor bloquea, crea un aviso en Reparaciones con el intervalo recomendado.

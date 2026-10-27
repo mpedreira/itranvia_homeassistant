@@ -7,7 +7,12 @@
         "data": {
           "parada": "Stop number",
           "max_llegadas": "Maximum arrivals to show",
-          "intervalo": "Polling interval (seconds)"
+          "intervalo": "Polling interval (seconds)",
+          "pausa_desde": "Do not query from (time)",
+          "pausa_hasta": "Do not query until (time)"
+        },
+        "data_description": {
+          "pausa_desde": "Night pause: no requests between these two times; sensors show \"No buses\". If both are equal there is no pause."
         }
       }
     },
@@ -26,7 +31,12 @@
         "title": "Options",
         "data": {
           "max_llegadas": "Maximum arrivals to show",
-          "intervalo": "Polling interval (seconds)"
+          "intervalo": "Polling interval (seconds)",
+          "pausa_desde": "Do not query from (time)",
+          "pausa_hasta": "Do not query until (time)"
+        },
+        "data_description": {
+          "pausa_desde": "Night pause: no requests between these two times; sensors show \"No buses\". If both are equal there is no pause."
         }
       }
     },

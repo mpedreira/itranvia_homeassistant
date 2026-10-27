@@ -7,7 +7,12 @@
         "data": {
           "parada": "Número de parada",
           "max_llegadas": "Máximo de chegadas a amosar",
-          "intervalo": "Intervalo de consulta (segundos)"
+          "intervalo": "Intervalo de consulta (segundos)",
+          "pausa_desde": "Non consultar desde (hora)",
+          "pausa_hasta": "Non consultar ata (hora)"
+        },
+        "data_description": {
+          "pausa_desde": "Pausa nocturna: non se consulta entre estas dúas horas, e os sensores marcan \"Sen buses\". Se as dúas son iguais, non hai pausa."
         }
       }
     },
@@ -26,7 +31,12 @@
         "title": "Opcións",
         "data": {
           "max_llegadas": "Máximo de chegadas a amosar",
-          "intervalo": "Intervalo de consulta (segundos)"
+          "intervalo": "Intervalo de consulta (segundos)",
+          "pausa_desde": "Non consultar desde (hora)",
+          "pausa_hasta": "Non consultar ata (hora)"
+        },
+        "data_description": {
+          "pausa_desde": "Pausa nocturna: non se consulta entre estas dúas horas, e os sensores marcan \"Sen buses\". Se as dúas son iguais, non hai pausa."
         }
       }
     },
