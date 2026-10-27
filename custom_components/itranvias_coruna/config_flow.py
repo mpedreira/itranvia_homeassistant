@@ -62,10 +62,12 @@ def _comprobar_limite(hass, datos: dict, excluir: str | None = None):
     """Devuelve (error, placeholders) si la suma de paradas supera el límite diario."""
     otras = _paradas_otras(hass, excluir)
     horas = horas_activas(datos[CONF_PAUSA_DESDE], datos[CONF_PAUSA_HASTA])
-    if excede_limite(otras + [(datos[CONF_INTERVALO], horas)]):
-        return "intervalo_demasiado_bajo", {
-            "minimo": str(intervalo_minimo(len(otras) + 1, horas))
-        }
+    minimo = intervalo_minimo(len(otras) + 1, horas)
+    # Vale si el total cabe en el límite, o si este intervalo ya es el recomendado para el
+    # número de paradas: así se pueden ir corrigiendo las paradas una a una sin quedarse
+    # bloqueado por las que todavía tienen el intervalo antiguo.
+    if excede_limite(otras + [(datos[CONF_INTERVALO], horas)]) and datos[CONF_INTERVALO] < minimo:
+        return "intervalo_demasiado_bajo", {"minimo": str(minimo)}
     return None, {}
 
 
