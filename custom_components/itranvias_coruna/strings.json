@@ -7,13 +7,19 @@
         "data": {
           "parada": "Número de parada",
           "max_llegadas": "Máximo de llegadas a mostrar",
-          "intervalo": "Intervalo de consulta (segundos)"
+          "intervalo": "Intervalo de consulta (segundos)",
+          "pausa_desde": "No consultar desde (hora)",
+          "pausa_hasta": "No consultar hasta (hora)"
+        },
+        "data_description": {
+          "pausa_desde": "Pausa nocturna: no se consulta entre estas dos horas, y los sensores marcan \"Sin buses\". Si las dos son iguales, no hay pausa."
         }
       }
     },
     "error": {
       "cannot_connect": "No se pudo consultar iTranvías",
-      "parada_desconocida": "Esa parada no existe en el catálogo de iTranvías"
+      "parada_desconocida": "Esa parada no existe en el catálogo de iTranvías",
+      "intervalo_demasiado_bajo": "Intervalo demasiado bajo: con las paradas configuradas el proveedor te bloquearía (límite de 1999 consultas al día). Usa al menos {minimo} segundos."
     },
     "abort": {
       "already_configured": "Esta parada ya está configurada"
@@ -25,9 +31,17 @@
         "title": "Opciones",
         "data": {
           "max_llegadas": "Máximo de llegadas a mostrar",
-          "intervalo": "Intervalo de consulta (segundos)"
+          "intervalo": "Intervalo de consulta (segundos)",
+          "pausa_desde": "No consultar desde (hora)",
+          "pausa_hasta": "No consultar hasta (hora)"
+        },
+        "data_description": {
+          "pausa_desde": "Pausa nocturna: no se consulta entre estas dos horas, y los sensores marcan \"Sin buses\". Si las dos son iguales, no hay pausa."
         }
       }
+    },
+    "error": {
+      "intervalo_demasiado_bajo": "Intervalo demasiado bajo: con las paradas configuradas el proveedor te bloquearía (límite de 1999 consultas al día). Usa al menos {minimo} segundos."
     }
   },
   "entity": {
@@ -41,6 +55,12 @@
       "ultima_actualizacion": {
         "name": "Última actualización"
       }
+    }
+  },
+  "issues": {
+    "limite_consultas": {
+      "title": "Límite de consultas de iTranvías",
+      "description": "La parada {parada} está recibiendo bloqueos del proveedor (HTTP 429/403/503). El intervalo actual es de {intervalo} s. Con las paradas configuradas se recomienda al menos {minimo} s. Súbelo en Configurar. El aviso desaparece solo cuando vuelve a funcionar."
     }
   }
 }
